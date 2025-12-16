@@ -4,7 +4,6 @@ import './Dashboard.css';
 import { FaSearch, FaHistory, FaTrash, FaPlus, FaCheckCircle, FaTimes, FaExclamationTriangle, FaUserShield, FaFileCsv, FaEye, FaArrowLeft } from 'react-icons/fa';
 import { HiOutlineDocumentReport } from "react-icons/hi";
 import { IoIosArrowBack, IoIosArrowForward } from 'react-icons/io';
-// Added updateUserPasswordDB to import
 import { getBooks, getUsers, getTransactions, addBookToDB, deleteBookFromDB, borrowBookDB, returnBookDB, deleteUserFromDB, addUserToDB, updateUserPasswordDB } from '../db';
 
 const Dashboard = ({ user, setUser }) => {
@@ -53,7 +52,7 @@ const Dashboard = ({ user, setUser }) => {
   const [newBook, setNewBook] = useState({ title: "", author: "", category: "" });
   const [newLibrarian, setNewLibrarian] = useState({ username: "", password: "" });
   
-  // --- NEW: Profile Password Update State ---
+  // Profile Password Update State
   const [profilePassword, setProfilePassword] = useState("");
 
   // --- LOAD DATA ---
@@ -134,27 +133,16 @@ const Dashboard = ({ user, setUser }) => {
 
   const handleViewProfile = (student) => {
     setSelectedStudent(student);
-    setProfilePassword(""); // Clear previous input
-    setActiveTab('student_profile');
-  };
-
-  // --- NEW: Handle Password Update ---
+    setProfilePassword(""); 
+    setActiveTab('student_profile');  };
   const handlePasswordUpdate = async () => {
     if (!profilePassword) {
       alert("Please enter a new password.");
-      return;
-    }
-    
-    // Determine whose profile we are updating
-    // If Admin/Librarian is viewing a student -> selectedStudent.id
-    // If Student is viewing their own profile -> user.id (requires user to be found in DB first)
+      return;    }
     
     let targetId;
     if (selectedStudent) {
-      targetId = selectedStudent.id;
-    } else {
-      // Find the current logged in user's ID from the students list or users list
-      // Since 'students' state has IDs, let's look there
+      targetId = selectedStudent.id;    } else {
       const currentUser = students.find(s => s.username === user.username) || admins.find(a => a.username === user.username);
       if(currentUser) targetId = currentUser.id;
     }
@@ -162,7 +150,7 @@ const Dashboard = ({ user, setUser }) => {
     if (targetId) {
       await updateUserPasswordDB(targetId, profilePassword);
       setProfilePassword("");
-      alert(`Password updated successfully for ${selectedStudent ? selectedStudent.username : user.username}!`);
+      alert(`Password updated successfully!`);
       refreshData();
     } else {
       alert("Error finding user ID.");
@@ -213,6 +201,20 @@ const Dashboard = ({ user, setUser }) => {
 
   // 1. DASHBOARD
   const renderDashboard = () => {
+    // --- UPDATED: Calculate Overdue Count ---
+    const overdueCount = transactions.filter(t => {
+      if (t.status === 'Borrowed') {
+        const borrowDate = new Date(t.borrowDate);
+        const today = new Date();
+        const diffTime = Math.abs(today - borrowDate);
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        // Check if greater than 6 days
+        return diffDays > 6;
+      }
+      return false;
+    }).length;
+    // ----------------------------------------
+
     const filtered = books.filter(b => {
       const matchesSearch = b.title.toLowerCase().includes(searchTerm.toLowerCase()) || 
                             b.author.toLowerCase().includes(searchTerm.toLowerCase());
@@ -226,14 +228,22 @@ const Dashboard = ({ user, setUser }) => {
     const currentBooks = filtered.slice(indexOfFirstBook, indexOfLastBook);
     const totalPages = Math.ceil(filtered.length / rowsPerPage);
 
-    return (
+    return ( 
       <>
         {!isStudent && (
           <div className="stats-row">
             <div className="stat-card"><div><h3>Total Books</h3><h1>{books.length}</h1></div><HiOutlineDocumentReport className="stat-icon" /></div>
             <div className="stat-card"><div><h3>Available</h3><h1>{books.filter(b=>b.status==='Available').length}</h1></div><FaCheckCircle className="stat-icon" /></div>
             <div className="stat-card"><div><h3>Borrowed</h3><h1>{books.filter(b=>b.status==='Borrowed').length}</h1></div><FaTimes className="stat-icon" /></div>
-            <div className="stat-card"><div><h3>Overdue</h3><h1>{books.filter(b=>b.status==='Overdue').length || 0}</h1></div><FaExclamationTriangle className="stat-icon" /></div>
+            
+            {/* UPDATED OVERDUE CARD */}
+            <div className="stat-card">
+              <div>
+                <h3>Overdue</h3>
+                <h1>{overdueCount}</h1>
+              </div>
+              <FaExclamationTriangle className="stat-icon" />
+            </div>
           </div>
         )}
 
@@ -346,11 +356,13 @@ const Dashboard = ({ user, setUser }) => {
     </div>
   );
 
-  // 3. STUDENT PROFILE VIEW (Combined Logic for Admin viewing Student & Student Viewing Self)
+  // 3. STUDENT PROFILE VIEW (Only for Admin/Librarian now)
   const renderStudentProfile = () => {
-    // Determine profile subject: 'selectedStudent' (if admin clicked view) OR 'user' (if student logged in)
-    const profileUser = selectedStudent || user;
+    // Only used when Admin views a student. Students don't have access to this view anymore.
+    const profileUser = selectedStudent;
     
+    if(!profileUser) return null;
+
     const studentHistory = transactions.filter(t => t.username === profileUser.username);
     const activeBorrows = studentHistory.filter(t => t.status === 'Borrowed');
 
@@ -361,10 +373,7 @@ const Dashboard = ({ user, setUser }) => {
             <div className="profile-icon-circle"><FaUserShield /></div>
             <h1>{profileUser.username} Profile</h1>
           </div>
-          {/* Show Back button only if Admin/Librarian came from list */}
-          {!isStudent && (
-            <button className="btn-back" onClick={() => setActiveTab('students')}><FaArrowLeft /> Back to Students List</button>
-          )}
+          <button className="btn-back" onClick={() => setActiveTab('students')}><FaArrowLeft /> Back to Students List</button>
         </div>
         <hr className="divider" />
         
@@ -465,27 +474,53 @@ const Dashboard = ({ user, setUser }) => {
       {/* HEADER */}
       <header className="top-header">
         <div className="header-left"><span className="brand-icon">🏛️</span><div className="brand-name"><h1>Library</h1><h2>System</h2></div></div>
-        <nav className="header-nav">
-          <button className={`nav-btn ${activeTab==='dashboard'?'active':''}`} onClick={()=>setActiveTab('dashboard')}>{isStudent ? 'Book Collection' : 'Dashboard'}</button>
-          {!isStudent && (<><button className={`nav-btn ${activeTab==='students' || activeTab==='student_profile' ?'active':''}`} onClick={()=>setActiveTab('students')}>Students</button><button className={`nav-btn ${activeTab==='overdue'?'active':''}`} onClick={()=>setActiveTab('overdue')}>Overdue Report</button><button className={`nav-btn ${activeTab==='transactions'?'active':''}`} onClick={()=>setActiveTab('transactions')}>All Transactions</button></>)}
-          {isAdmin && (<button className={`nav-btn ${activeTab==='admin'?'active':''}`} onClick={()=>setActiveTab('admin')}>Admin Management</button>)}
-          {isStudent && (<button className={`nav-btn ${activeTab==='profile'?'active':''}`} onClick={()=>setActiveTab('profile')}>My Profile</button>)}
+        
+        {/* --- MODIFIED NAVIGATION (Removed Tools for Students) --- */}
+        <nav className="header-nav"> 
+          
+          {/* Dashboard Button: Only for Admin/Librarian (Students default here anyway but no button) */}
+          {!isStudent && (
+            <button className={`nav-btn ${activeTab==='dashboard'?'active':''}`} onClick={()=>setActiveTab('dashboard')}>
+              Dashboard
+            </button>
+          )}
+
+          {/* Admin/Librarian specific tabs */}
+
+          {!isStudent && (
+             <>
+               <button className={`nav-btn ${activeTab==='students' || activeTab==='student_profile' ?'active':''}`} onClick={()=>setActiveTab('students')}>Students</button>
+               <button className={`nav-btn ${activeTab==='overdue'?'active':''}`} onClick={()=>setActiveTab('overdue')}>Overdue Report</button>
+               <button className={`nav-btn ${activeTab==='transactions'?'active':''}`} onClick={()=>setActiveTab('transactions')}>All Transactions</button>
+             </>
+          )}      
+          
+          {isAdmin && (
+            <button className={`nav-btn ${activeTab==='admin'?'active':''}`} onClick={()=>setActiveTab('admin')}>Admin Management</button>
+          )}
+
+          {/* Student Tools - COMPLETELY REMOVED as requested */}
+          
         </nav>
+
         <div className="header-right"><span>Welcome, {user?.username}! ({user?.role})</span><button onClick={handleLogout} className="logout-btn">Log out</button></div>
       </header>
 
       {/* CONTENT SWITCHER */}
       <div className="content-area">
         {activeTab === 'dashboard' && renderDashboard()}
+        
+        {/* Only Admin/Librarian can access these tabs */}
         {activeTab === 'students' && !isStudent && renderStudents()}
-        {activeTab === 'student_profile' && renderStudentProfile()} {/* Unified Profile View */}
+        {activeTab === 'student_profile' && !isStudent && renderStudentProfile()}
         {activeTab === 'overdue' && !isStudent && renderOverdue()}
         {activeTab === 'transactions' && renderTransactions()}
         {activeTab === 'admin' && isAdmin && renderAdminManagement()}
-        {activeTab === 'profile' && isStudent && renderStudentProfile()} {/* Student uses same function */}
+        
+        {/* 'profile' tab removed for student, so no render call needed here */}
       </div>
 
-      <footer className="footer"><p>© 2025 Library Management System.</p></footer>
+      <footer className="footer"><p>© 2025 Library Management System.Designed by Thulasikumar</p></footer>
 
       {/* --- CONFIRMATION MODALS --- */}
       {showAddModal && (
