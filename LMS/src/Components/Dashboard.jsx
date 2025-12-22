@@ -6,7 +6,7 @@ import { HiOutlineDocumentReport } from "react-icons/hi";
 import { IoIosArrowBack, IoIosArrowForward } from 'react-icons/io';
 import { getBooks, getUsers, getTransactions, addBookToDB, deleteBookFromDB, borrowBookDB, returnBookDB, deleteUserFromDB, addUserToDB, updateUserPasswordDB } from '../db';
 
-history
+
 const Dashboard = ({ user, setUser }) => {
   const navigate = useNavigate();
 
