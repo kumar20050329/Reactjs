@@ -12,7 +12,7 @@ const Dashboard = ({ user, setUser }) => {
   // --- ROLES HELPER ---
   const isStudent = user?.role === 'Student';
   const isAdmin = user?.role === 'Admin';
-  const isLibrarian = user?.role === 'Librarian';
+  //const isLibrarian = user?.role === 'Librarian';
 
   // --- STATE ---
   const [activeTab, setActiveTab] = useState('dashboard');
@@ -56,7 +56,7 @@ const Dashboard = ({ user, setUser }) => {
   const [profilePassword, setProfilePassword] = useState("");
 
   // --- LOAD DATA ---
-  const refreshData = async () => {
+  const refreshData = async () =>  {
     const allBooks = await getBooks();
     const allUsers = await getUsers();
     const allTrans = await getTransactions();
@@ -78,6 +78,7 @@ const Dashboard = ({ user, setUser }) => {
 
   // --- HANDLERS ---
   const handleLogout = () => { setUser(null); navigate('/'); };
+
 
   const handleSaveBook = async () => {
     if (newBook.title) {
@@ -164,12 +165,12 @@ const Dashboard = ({ user, setUser }) => {
       let days = 0;
       const borrowDate = new Date(t.borrowDate);
       if(t.returnDate !== "-" && t.returnDate) {
-         const returnDate = new Date(t.returnDate);
-         const diff = Math.abs(returnDate - borrowDate);
+        const returnDate = new Date(t.returnDate);
+        const diff = Math.abs(returnDate - borrowDate);
          days = Math.ceil(diff / (1000 * 60 * 60 * 24));
       } else {
-         const today = new Date();
-         const diff = Math.abs(today - borrowDate);
+        const today = new Date();
+        const diff = Math.abs(today - borrowDate);
          days = Math.ceil(diff / (1000 * 60 * 60 * 24));
       }
       return { ...t, duration: days };
@@ -469,6 +470,8 @@ const Dashboard = ({ user, setUser }) => {
     </div>
   );
 
+
+
   return (
     <div className="main-container">
       {/* HEADER */}
@@ -502,7 +505,7 @@ const Dashboard = ({ user, setUser }) => {
           {/* Student Tools - COMPLETELY REMOVED as requested */}
           
         </nav>
-
+          
         <div className="header-right"><span>Welcome, {user?.username}! ({user?.role})</span><button onClick={handleLogout} className="logout-btn">Log out</button></div>
       </header>
 
