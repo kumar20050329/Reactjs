@@ -1,12 +1,45 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, Link } from 'react-router-dom'; // Added Link here
-import './Login.css';
+import { useNavigate, Link } from 'react-router-dom';
 import LMSImage from '../assets/LMS.png'; 
 import { getUsers } from '../db'; 
+import './Login.css'; 
+
+// --- RJSF IMPORTS ---
+import Form from '@rjsf/core';
+import validator from '@rjsf/validator-ajv8';
+
+// ==============================
+// 1. SCHEMA
+// ==============================
+const loginSchema = {
+  type: "object",
+  required: ["username", "password"],
+  properties: {
+    username: { type: "string", title: "Username" },
+    password: { type: "string", title: "Password", minLength: 1 }
+  }
+};
+
+// ==============================
+// 2. UI SCHEMA (Modern Configuration)
+// ==============================
+const loginUiSchema = {
+  "ui:submitButtonOptions": { norender: true },
+  
+  username: {
+    "ui:placeholder": "Enter your username",
+    "ui:classNames": "modern-input-group", 
+    "ui:autofocus": true
+  },
+  
+  password: {
+    "ui:widget": "password",
+    "ui:placeholder": "Enter your password",
+    "ui:classNames": "modern-input-group"
+  }
+};
 
 const Login = ({ setUser }) => {
-  const [username, setUsername] = useState('');
-  const [password, setPassword] = useState('');
   const [dbUsers, setDbUsers] = useState([]); 
   const navigate = useNavigate();
 
@@ -18,10 +51,10 @@ const Login = ({ setUser }) => {
     loadUsers();
   }, []);
 
-  const handleLogin = (e) => {
-    e.preventDefault();
-    
-    const foundUser = dbUsers.find(u => u.username === username && u.password === password);
+  const handleRJSFSubmit = ({ formData }) => {
+    const foundUser = dbUsers.find(
+      u => u.username === formData.username && u.password === formData.password
+    );
 
     if (foundUser) {
       localStorage.setItem('libraryUser', JSON.stringify(foundUser));
@@ -34,34 +67,39 @@ const Login = ({ setUser }) => {
 
   return (
     <div className="split-screen">
+      
+      {/* LEFT PANE (Image & Gradient) */}
       <div className="left-pane">
-        <img className="book-image" src={LMSImage} alt="Library" />
-        <div className="welcome-text">
-          <h2>Library Management System</h2>
-          <p>Read.Learn.Grow</p>
+        <div className="glass-overlay">
+          <img src={LMSImage} alt="Library" className="hero-image" />
+          <div className="welcome-text">
+            <h2>Library Management System</h2>
+            <p>Read.Learn.Grow</p>
+          </div>
         </div>
       </div>
+      
+      {/* RIGHT PANE (Form) */}
       <div className="right-pane">
-        <div className="login-box">
-          <h2 className="logo-text">LMS</h2>
-          <h2 className="form-title">Login</h2>
-          <form onSubmit={handleLogin}>
-            <div className="input-group">
-              <label>Username</label>
-              <input type="text" value={username} onChange={(e) => setUsername(e.target.value)} required />
-            </div>
-            <div className="input-group">
-              <label>Password</label>
-              <input type="password" value={password} onChange={(e) => setPassword(e.target.value)} required />
-            </div>
+        <div className="login-card">
+          <div className="login-header">
+            <h1 className="brand-logo">LMS</h1>
+            <h3>Welcome Back</h3>
+            <p className="subtitle">Please enter your details to sign in.</p>
+          </div>
 
-            {/* --- FORGOT PASSWORD LINK ADDED HERE --- */}
-            <div className="forgot-pass">
-              <Link to="/forgot">Forgot Password?</Link>
+          <Form 
+            schema={loginSchema}
+            uiSchema={loginUiSchema}
+            validator={validator}
+            onSubmit={handleRJSFSubmit}
+            className="rjsf-pro-form"
+          >
+            <div className="form-footer">
+              <Link to="/forgot" className="forgot-link">Forgot Password?</Link>
+              <button type="submit" className="pro-login-btn">Log In</button>
             </div>
-
-            <button type="submit" className="login-btn">Log In</button>
-          </form>
+          </Form>
         </div>
       </div>
     </div>

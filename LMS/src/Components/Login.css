@@ -1,169 +1,275 @@
-/* Container */
+/* =========================================
+   GLOBAL RESET & FONTS
+   ========================================= */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: 'Inter', sans-serif;
+}
+
+/* =========================================
+   LAYOUT (SPLIT SCREEN)
+   ========================================= */
 .split-screen {
   display: flex;
   height: 100vh;
   width: 100vw;
+  overflow: hidden;
 }
 
 /* --- LEFT SIDE: Gradient & Image --- */
 .left-pane {
-  flex: 1.2;
-  /* Screenshot Gradient */
-  background: linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%);
+  flex: 1.3;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   display: flex;
-  flex-direction: column;
   justify-content: center;
   align-items: center;
-  padding: 40px;
+  position: relative;
 }
 
-/* Image Styling - NO ANIMATION
-.image-box {
-  width: 100%;
+.glass-overlay {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  padding: 60px;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  text-align: center;
   display: flex;
-  justify-content: center;
-  margin-bottom: 20px;
+  flex-direction: column;
+  align-items: center;
 }
 
 .hero-image {
-  width: 90%;
-  max-width: 450px;
-  height: auto;
-  display: block;
-  /* Removed animation and mix-blend-mode */
-
-
-/* Text under image */
-.welcome-text {
-  text-align: center;
-  z-index: 2;
+  width: 100%;
+  max-width: 350px;
+  margin-bottom: 30px;
+  filter: drop-shadow(0 10px 20px rgba(0,0,0,0.2));
 }
 
 .welcome-text h2 {
-  color: #333;
-  font-size: 28px;
+  color: #fff;
+  font-size: 32px;
   font-weight: 700;
-  margin-bottom: 5px;
+  margin: 0 0 10px 0;
 }
 
 .welcome-text p {
-  color: #333;
+  color: rgba(255, 255, 255, 0.9);
   font-size: 16px;
+  margin: 0;
 }
 
 /* --- RIGHT SIDE: Form --- */
 .right-pane {
   flex: 1;
-  background-color: #ffffff;
+  background-color: #f8f9fc;
   display: flex;
   justify-content: center;
   align-items: center;
   padding: 40px;
 }
 
-.login-box {
+.login-card {
   width: 100%;
-  max-width: 380px;
+  max-width: 400px;
+  background: #ffffff;
+  padding: 40px;
+  border-radius: 16px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06);
 }
 
-/* Logo */
-.logo-text {
-  font-size: 32px;
-  font-weight: 800;
-  color: #6c63ff; /* Purple Color */
-  margin-bottom: 20px;
-  display: inline-block;
-  border-bottom: 3px solid #6c63ff;
+.login-header {
+  margin-bottom: 25px; 
+  text-align: center;
 }
 
-/* Form Styles */
-.form-title {
+.brand-logo {
+  font-size: 28px;
+  font-weight: 900;
+  color: #6c63ff;
+  margin: 0 0 10px 0;
+  letter-spacing: -1px;
+}
+
+.login-header h3 {
   font-size: 24px;
-  color: #333;
-  margin-bottom: 8px;
+  color: #1a1a1a;
+  margin: 0 0 5px 0;
   font-weight: 700;
 }
 
-.form-subtitle {
+.subtitle {
   color: #666;
   font-size: 14px;
-  margin-bottom: 30px;
+  margin: 0;
 }
 
-/* Inputs */
-.input-group {
-  margin-bottom: 20px;
+/* =========================================
+   RJSF FORM OVERRIDES
+   ========================================= */
+
+.rjsf-pro-form .field-object > legend,
+.rjsf-pro-form .field-object > h3 {
+  display: none;
 }
 
-.input-group label {
+.rjsf-pro-form fieldset {
+  border: none !important;
+  margin: 0;
+  padding: 0;
+}
+
+.rjsf-pro-form .form-group {
+  margin-bottom: 15px; 
+}
+
+.rjsf-pro-form label {
   display: block;
   font-size: 13px;
-  color: #555;
-  margin-bottom: 8px;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 6px; 
+}
+
+/* =========================================
+   INPUT FIELDS
+   ========================================= */
+
+.modern-input-group input {
+  width: 100%;
+  padding: 12px 16px;
+  font-size: 15px;
+  color: #333;
+  background-color: #fff;
+  border: 1px solid #e5e7eb !important; 
+  border-radius: 8px;
+  outline: none !important;
+  box-shadow: none !important;
+  transition: all 0.2s ease-in-out;
+}
+
+.modern-input-group input:focus {
+  outline: none !important;
+  border-color: #6c63ff !important;
+  box-shadow: 0 0 0 3px rgba(108, 99, 255, 0.15) !important;
+}
+
+.modern-input-group input:-webkit-autofill,
+.modern-input-group input:-webkit-autofill:hover, 
+.modern-input-group input:-webkit-autofill:focus, 
+.modern-input-group input:-webkit-autofill:active {
+    -webkit-text-fill-color: #333 !important;
+    border: 1px solid #e5e7eb !important;
+}
+
+.text-danger {
+  color: #ef4444;
+  font-size: 12px;
   font-weight: 500;
+  margin-top: 4px;
+  display: block;
 }
 
-.input-group input {
+/* =========================================
+   BUTTONS & LINKS
+   ========================================= */
+
+.form-footer {
+  margin-top: -12px; 
+}
+
+/* Forgot Password Link (Login Page) */
+.forgot-link {
+  display: block;
+  text-align: right;
+  color: #6b7280;
+  font-size: 13px;
+  text-decoration: none;
+  font-weight: 500;
+  margin-bottom: 30px; 
+  transition: color 0.2s;
+}
+
+.forgot-link:hover {
+  color: #6c63ff;
+}
+
+/* Login/Reset Button */
+.pro-login-btn {
   width: 100%;
-  padding: 12px 15px;
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  font-size: 14px;
-  transition: 0.3s;
-}
-
-.input-group input:focus {
-  outline: none;
-  border-color: #6c63ff;
-  box-shadow: 0 0 0 3px rgba(108, 99, 255, 0.1);
-}
-
-/* Password Eye */
-.password-wrapper {
-  position: relative;
-}
-
-.eye-icon {
-  position: absolute;
-  right: 15px;
-  top: 50%;
-  transform: translateY(-50%);
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-}
-
-/* Button */
-.login-btn {
-  width: 100%;
-  padding: 14px;
-  background-color: #6c63ff;
+  padding: 12px;
+  background: linear-gradient(135deg, #6c63ff 0%, #5a52d5 100%);
   color: white;
   border: none;
-  border-radius: 6px;
+  border-radius: 8px;
   font-size: 16px;
   font-weight: 600;
   cursor: pointer;
-  transition: background 0.3s;
+  transition: transform 0.2s, box-shadow 0.2s;
+  box-shadow: 0 4px 12px rgba(108, 99, 255, 0.3);
+  margin-bottom: 0;
 }
 
-.login-btn:hover {
-  background-color: #5a52d5;
+.pro-login-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 15px rgba(108, 99, 255, 0.4);
 }
 
-/* Links */
-.forgot-pass {
-  text-align: right;
-  margin-bottom: 25px;
+.pro-login-btn:active {
+  transform: translateY(0);
 }
-.forgot-pass a {
-  color: #6c63ff;
-  font-size: 13px;
+
+/* NEW: Back to Login Link (Forgot Page) */
+.back-link {
+  display: block;
+  text-align: center;
+  margin-top: 20px;
+  margin-bottom: 0; /* Removing extra bottom space */
+  color: #666;
+  font-size: 14px;
   text-decoration: none;
+  font-weight: 500;
 }
 
-/* Mobile */
-@media (max-width: 768px) {
-  .split-screen { flex-direction: column; }
-  .left-pane { display: none; }
+.back-link:hover {
+  color: #6c63ff;
+  text-decoration: underline;
+}
+
+/* =========================================
+   MOBILE RESPONSIVENESS
+   ========================================= */
+@media (max-width: 900px) {
+  .split-screen {
+    flex-direction: column;
+  }
+  .left-pane {
+    flex: 0.5;
+    min-height: 250px;
+  }
+  .glass-overlay {
+    padding: 20px;
+    background: transparent;
+    border: none;
+    backdrop-filter: none;
+  }
+  .hero-image {
+    max-width: 150px;
+  }
+  .welcome-text h2 { font-size: 24px; }
+  .right-pane {
+    flex: 1;
+    border-radius: 20px 20px 0 0;
+    margin-top: -20px;
+    background: white;
+  }
+  .login-card {
+    box-shadow: none;
+    padding: 20px;
+  }
 }

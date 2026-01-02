@@ -11,7 +11,7 @@ export const initDB = async () => {
         bookStore.add({ title: "Physics Vol-1", author: "H.C. Verma", category: "Science", status: "Available" });
         bookStore.add({ title: "The Great Gatsby", author: "F. Scott Fitzgerald", category: "Fiction", status: "Available" });
         bookStore.add({ title: "Sapiens", author: "Yuval Noah Harari", category: "History", status: "Available" });
-        bookStore.add({ title: "Clean Code", author: "Robert Martin", category: "Tech", status: "Available" });
+        bookStore.add({ title: "Clean Code", author: "Robert Martin", category: "Technology", status: "Available" });
       }
       if (!db.objectStoreNames.contains('users')) {
         const userStore = db.createObjectStore('users', { keyPath: 'id', autoIncrement: true });
