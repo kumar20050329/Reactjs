@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import Login from './Components/Login.jsx';
-import Hello from './Components/hello.jsx';
 import Dashboard from './Components/Dashboard.jsx';
 import Forgot from './Components/Forgot.jsx'; // Forgot page iruntha vechukonga
 
@@ -25,7 +24,6 @@ function App() {
           path="/dashboard" 
           element={user ? <Dashboard user={user} setUser={setUser} /> : <Navigate to="/" />} 
         />
-        <Route path="/hello" element={<Hello />} />
       </Routes>
     </BrowserRouter>
   );
